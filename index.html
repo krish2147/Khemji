@@ -14,7 +14,7 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%2310281d'/%3E%3Cpath d='M7 8h13v14a3 3 0 0 1-3 3h-7a3 3 0 0 1-3-3z' fill='none' stroke='%23f5efdf' stroke-width='1.8'/%3E%3Cpath d='M20 11h2.5a2.5 2.5 0 0 1 0 5H20' fill='none' stroke='%23f5efdf' stroke-width='1.8'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Montserrat:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Montserrat:wght@400;500;600&family=Playfair+Display:ital,wght@0,600;0,800;1,500&family=Caveat:wght@600&display=swap" rel="stylesheet">
 <style>
 :root{
   --canvas:#10281d; --panel:#17372a; --panel-2:#1d4233;
@@ -221,8 +221,11 @@ html.book-open{overflow:hidden}
 .face::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(90deg,rgba(0,0,0,.18),transparent 22%);opacity:0;transition:opacity .75s}
 .leaf.turning .face::after{opacity:1}
 
-.pg{position:absolute;inset:0;display:flex;flex-direction:column;overflow:hidden auto;overscroll-behavior:contain;padding:clamp(20px,5.5%,44px) clamp(20px,7%,48px) 16px;
-  background:radial-gradient(140% 90% at 50% 0%,#fbf5e6 0%,#f3e8cf 70%,#ecdfc2 100%);box-shadow:0 24px 60px rgba(0,0,0,.45)}
+.pg{--ink:#1f2a22;--green:#17392b;--brown:#7e4a1e;--gold:#b08a4e;--muted:#7a6c52;--serif:"Playfair Display",Georgia,"Times New Roman",serif;--script:"Caveat","Segoe Script",cursive;
+  position:absolute;inset:0;display:flex;flex-direction:column;overflow:hidden auto;overscroll-behavior:contain;padding:clamp(26px,6.5%,50px) clamp(24px,8%,52px) 18px;color:var(--ink);
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .45 0 0 0 0 .33 0 0 0 0 .16 0 0 0 .09 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"),
+    radial-gradient(140% 90% at 50% 0%,#fcf7ea 0%,#f4e9d0 68%,#eadcbc 100%);box-shadow:0 24px 60px rgba(0,0,0,.45)}
+.pg:not(.is-cover):not(.blank)::after{content:"";position:absolute;inset:12px;border:3px double rgba(176,138,78,.55);border-radius:3px;pointer-events:none}
 .slot.l .pg,.leaf.on-r .back .pg,.leaf.on-l .front .pg{border-radius:14px 3px 3px 14px}
 .slot.r .pg,.leaf.on-r .front .pg,.leaf.on-l .back .pg{border-radius:3px 14px 14px 3px}
 .book:not(.spread) .pg{border-radius:4px 14px 14px 4px}
@@ -232,29 +235,51 @@ html.book-open{overflow:hidden}
 .pg.blank{background:#ecdfc2}
 .pg.is-cover{padding:0;background:none}
 .pg.is-cover .cover{border-radius:inherit}
-.pg .no{margin-top:auto;padding-top:12px;text-align:center;font-size:12px;letter-spacing:.2em;color:#8a7a5c}
-.pg h3{font:800 clamp(30px,4vh,42px)/1 var(--display);color:#133126;margin:0}
-.pg .tag{margin:6px 0 0;font-size:14px;color:#6b5d44;font-style:italic}
-.pg-head{display:flex;align-items:center;gap:16px;padding-bottom:16px;margin-bottom:10px;border-bottom:1.5px solid #133126}
-.pg-head svg{width:58px;height:58px;flex:none;color:#b07a44}
-.pg-head svg *{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.pg .no{margin-top:auto;padding-top:10px;text-align:center;font:500 italic 13px/1 var(--serif);color:var(--muted);display:flex;align-items:center;justify-content:center;gap:10px}
+.pg .no::before,.pg .no::after{content:"";width:22px;height:1px;background:currentColor;opacity:.6}
 .pg ul{list-style:none;margin:0;padding:0}
-.pg li{display:flex;align-items:baseline;gap:8px;padding:clamp(6px,1.1vh,10px) 0;font-size:clamp(15px,1.9vh,17px);color:#1d2a20}
-.pg li .d{flex:1;border-bottom:1.5px dotted #b8a888;transform:translateY(-4px);min-width:16px}
-.pg li b{font-weight:600;color:#8a4f1c;font-variant-numeric:tabular-nums}
-.pg.welcome{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:14px}
-.pg.welcome img{width:64%;height:auto;filter:brightness(0) opacity(.82)}
-.pg.welcome .big{font:800 clamp(26px,3.6vh,36px)/1.1 var(--display);color:#133126;margin:6px 0 0}
-.pg.welcome p{margin:0;color:#4d4433;font-size:15px;max-width:28ch}
-.pg.welcome .veg{display:inline-flex;align-items:center;gap:8px;font-weight:600;color:#2e6b3a;font-size:14px}
-.pg.welcome .veg i{width:14px;height:14px;border:1.5px solid currentColor;display:grid;place-items:center}
-.pg.welcome .veg i::after{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+.orn{display:flex;align-items:center;justify-content:center;gap:10px;color:var(--gold);margin:8px auto 0;width:72%}
+.orn::before,.orn::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,transparent,currentColor)}
+.orn::after{background:linear-gradient(270deg,transparent,currentColor)}
+.orn svg{width:34px;height:12px;fill:currentColor}
+.veg{display:inline-grid;place-items:center;width:13px;height:13px;border:1.5px solid #2f7a3e;flex:none;border-radius:2px}
+.veg::after{content:"";width:5px;height:5px;border-radius:50%;background:#2f7a3e}
+.msec{text-align:center}
+.msec+.msec{margin-top:clamp(14px,2.6vh,26px)}
+.msec svg.ic{display:block;width:40px;height:40px;margin:0 auto 4px;color:var(--brown)}
+.msec svg.ic *{fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.msec h3{font:800 clamp(26px,3.7vh,36px)/1.05 var(--serif);color:var(--green);margin:0;letter-spacing:.01em}
+.msec .tag{font:600 clamp(19px,2.5vh,23px)/1.1 var(--script);color:var(--brown);margin:6px 0 0}
+.fav{display:inline-block;margin-top:8px;padding:3px 10px 2px;border:1.5px solid var(--brown);border-radius:999px;font:600 10.5px/1.4 var(--body);letter-spacing:.16em;text-transform:uppercase;color:var(--brown);transform:rotate(-2deg)}
+.items-m{margin-top:clamp(10px,1.8vh,16px);text-align:left}
+.items-m li{display:flex;align-items:baseline;gap:8px;padding:clamp(5px,1vh,9px) 0}
+.items-m .nm{font:600 clamp(12.5px,1.6vh,14px)/1.3 var(--body);letter-spacing:.08em;text-transform:uppercase;color:var(--ink)}
+.items-m .d{flex:1;min-width:14px;border-bottom:1.5px dotted rgba(122,108,82,.55);transform:translateY(-4px)}
+.items-m .pr{font:600 clamp(16px,2vh,18px)/1 var(--serif);color:var(--brown);font-variant-numeric:lining-nums tabular-nums;min-width:3ch;text-align:right}
+.items-m .pr small{font-size:.72em;margin-right:1px;opacity:.8}
+.items-m.two .pr{width:64px}
+.items-m .cols{padding:0 0 2px;border:0}
+.items-m .cols span{font:500 italic 12.5px/1.2 var(--serif);color:var(--muted);width:64px;text-align:right;white-space:nowrap}
+.items-m .cols .sp{flex:1;width:auto}
+.pg.welcome{align-items:center;justify-content:center;text-align:center;gap:10px}
+.pg.welcome .hello{font:600 clamp(28px,4vh,38px)/1 var(--script);color:var(--brown);margin:0}
+.pg.welcome img{width:62%;height:auto;filter:brightness(0) opacity(.85);margin:4px 0}
+.pg.welcome .big{font:800 clamp(24px,3.4vh,32px)/1.1 var(--serif);color:var(--green);margin:4px 0 0}
+.pg.welcome p{margin:0;color:#4d4433;font-size:14.5px;max-width:28ch}
+.pg.welcome .note{display:inline-flex;align-items:center;gap:8px;font:600 12px/1.2 var(--body);letter-spacing:.14em;text-transform:uppercase;color:#2f7a3e}
+.pg.welcome .hours{font:500 italic 16px/1.5 var(--serif);color:var(--ink)}
+.pg.welcome .hours b{font-style:normal;font-weight:800;color:var(--green)}
+.pg .toc-h{text-align:center;margin-bottom:clamp(8px,1.6vh,14px)}
+.pg .toc-h h3{font:800 clamp(28px,3.8vh,36px)/1 var(--serif);color:var(--green);margin:0}
+.pg .toc-h .tag{font:600 20px/1.1 var(--script);color:var(--brown);margin:6px 0 0}
 .pg .toc-list li{padding:0}
-.pg .toc-list button{all:unset;cursor:pointer;display:flex;align-items:baseline;gap:8px;width:100%;padding:clamp(6px,1.15vh,10px) 0;font-size:clamp(15px,1.9vh,17px)}
-.pg .toc-list button:hover span:first-child,.pg .toc-list button:focus-visible span:first-child{color:#8a4f1c;text-decoration:underline;text-underline-offset:3px}
-.pg .toc-list button:focus-visible{outline:2px solid #b07a44;outline-offset:2px;border-radius:4px}
-.pg .toc-list .n{color:#8a7a5c;font-variant-numeric:tabular-nums}
-.pg.end .btn{margin-top:8px}
+.pg .toc-list button{all:unset;cursor:pointer;display:flex;align-items:baseline;gap:8px;width:100%;padding:clamp(5px,1.05vh,9px) 0}
+.pg .toc-list .nm{font:600 clamp(12.5px,1.6vh,14px)/1.3 var(--body);letter-spacing:.08em;text-transform:uppercase}
+.pg .toc-list .d{flex:1;min-width:14px;border-bottom:1.5px dotted rgba(122,108,82,.55);transform:translateY(-4px)}
+.pg .toc-list .n{font:500 italic 15px/1 var(--serif);color:var(--muted)}
+.pg .toc-list button:hover .nm,.pg .toc-list button:focus-visible .nm{color:var(--brown)}
+.pg .toc-list button:focus-visible{outline:2px solid var(--gold);outline-offset:2px;border-radius:4px}
+.pg.end .btn{margin-top:10px}
 
 /* pour your own */
 .pour{display:grid;grid-template-columns:1fr 1fr;gap:clamp(30px,6vw,90px);align-items:center}
@@ -720,17 +745,43 @@ const MENU=[
 /* ---------- menu book ---------- */
 const COVER='<div class="frame"><img src="assets/logo.png" alt="" width="1182" height="360"><span class="rule"></span><span class="ct">Menu</span><span class="cs">Khemji Café · Bhayli</span></div>';
 $('#coverArt').innerHTML=COVER;
-const SEC0=2;
+const ORN='<div class="orn" aria-hidden="true"><svg viewBox="0 0 34 12"><path d="M17 1l2.2 5L17 11l-2.2-5z"/><circle cx="7" cy="6" r="1.6"/><circle cx="27" cy="6" r="1.6"/></svg></div>';
+const rupee=n=>'<span class="pr"><small>₹</small>'+n+'</span>';
+// sections where every dish comes plain or with an add-on print as one row with two prices, like a real menu
+const ADDONS=[[' with Cheese','+ Cheese'],[' with Ice Cream','+ Ice cream']];
+function pairUp(items){
+  for(const[suf,label]of ADDONS){
+    const base=items.filter(it=>!it[0].endsWith(suf)), add=new Map(items.filter(it=>it[0].endsWith(suf)).map(it=>[it[0].slice(0,-suf.length),it[1]]));
+    if(add.size&&base.length===add.size&&base.every(it=>add.has(it[0])))return{label,rows:base.map(it=>[it[0],it[1],add.get(it[0])])};
+  }
+  return null;
+}
+function sectionHTML(m){
+  const pr=pairUp(m[3]);
+  const list=pr
+    ?'<ul class="items-m two"><li class="cols" aria-hidden="true"><span class="sp"></span><span>Regular</span><span>'+pr.label+'</span></li>'+
+      pr.rows.map(r=>'<li><span class="nm">'+r[0]+'</span><span class="d"></span>'+rupee(r[1])+rupee(r[2])+'</li>').join('')+'</ul>'
+    :'<ul class="items-m">'+m[3].map(it=>'<li><span class="nm">'+it[0]+'</span><span class="d"></span>'+rupee(it[1])+'</li>').join('')+'</ul>';
+  return '<section class="msec"><svg class="ic" viewBox="0 0 88 88" aria-hidden="true">'+ICONS[m[1]]+'</svg><h3>'+m[0]+'</h3>'+ORN+
+    '<p class="tag">'+m[2]+'</p>'+(m[0]==='Cold Coffee'?'<span class="fav">House favourite</span>':'')+list+'</section>';
+}
+// pack short sections together so no page is left almost empty
+const rowsOf=m=>{const pr=pairUp(m[3]);return pr?pr.rows.length+1:m[3].length};
+const SEC_PAGES=[];
+MENU.forEach((m,k)=>{const cost=rowsOf(m)+4.5, last=SEC_PAGES[SEC_PAGES.length-1];
+  if(last&&last.cost+cost<=14.5){last.secs.push(k);last.cost+=cost}else SEC_PAGES.push({secs:[k],cost})});
+const SEC0=2, SEC_PAGE=[];
+SEC_PAGES.forEach((pg,i)=>pg.secs.forEach(k=>SEC_PAGE[k]=SEC0+i));
 const PAGES=[
-  {cls:'welcome',html:'<img src="assets/logo.png" alt="Khemji" width="1182" height="360"><p class="big">Happy Hearts.</p><p>Everything is made fresh when you order. Prices in rupees.</p><span class="veg"><i></i>100% vegetarian</span><p>Open 1 PM to 1 AM, every day.<br>Bhayli, Vadodara.</p>'},
-  {cls:'contents',no:true,html:'<div class="pg-head"><div><h3>Contents</h3><p class="tag">Tap a section to turn to it</p></div></div><ul class="toc-list">'+
-    MENU.map((m,k)=>'<li><button type="button" data-go="'+(SEC0+k)+'"><span>'+m[0]+'</span><span class="d"></span><span class="n">'+(SEC0+k+1)+'</span></button></li>').join('')+'</ul>'},
-  ...MENU.map(m=>({cls:'sec',no:true,html:'<div class="pg-head"><svg viewBox="0 0 88 88" aria-hidden="true">'+ICONS[m[1]]+'</svg><div><h3>'+m[0]+'</h3><p class="tag">'+m[2]+'</p></div></div><ul>'+
-    m[3].map(it=>'<li><span>'+it[0]+'</span><span class="d"></span><b>₹'+it[1]+'</b></li>').join('')+'</ul>'})),
-  {cls:'welcome end',html:'<p class="big">Come sit. Stay late.</p><p>Want it made your way? Just ask at the counter.</p><a class="btn btn-main" href="https://maps.app.goo.gl/TBwgYedUMfASbDT4A" target="_blank" rel="noopener">Get directions</a>'},
-  {cls:'blank',html:''}
+  {cls:'welcome',html:'<p class="hello">Welcome to</p><img src="assets/logo.png" alt="Khemji" width="1182" height="360"><p class="big">Happy Hearts.</p>'+ORN+
+    '<p>Everything is made fresh when you order.</p><span class="note"><i class="veg"></i>Pure vegetarian</span><p class="hours">Open <b>1 PM – 1 AM</b>, every day<br>Bhayli, Vadodara</p><p style="font-size:12.5px;color:#7a6c52">All prices in Indian rupees (₹)</p>'},
+  {cls:'contents',no:true,html:'<div class="toc-h"><h3>The Menu</h3>'+ORN+'<p class="tag">tap a section to turn to it</p></div><ul class="toc-list">'+
+    MENU.map((m,k)=>'<li><button type="button" data-go="'+SEC_PAGE[k]+'"><span class="nm">'+m[0]+'</span><span class="d"></span><span class="n">'+(SEC_PAGE[k]+1)+'</span></button></li>').join('')+'</ul>'},
+  ...SEC_PAGES.map(pg=>({cls:'sec',no:true,html:pg.secs.map(k=>sectionHTML(MENU[k])).join('')})),
+  {cls:'welcome end',html:'<p class="hello">Thank you!</p><p class="big">Come sit. Stay late.</p>'+ORN+'<p>Want it made your way? Just ask at the counter.</p><a class="btn btn-main" href="https://maps.app.goo.gl/TBwgYedUMfASbDT4A" target="_blank" rel="noopener">Get directions</a>'}
 ];
-const LAST=PAGES.length-2; // last page worth landing on (the final blank only backs the spread)
+const LAST=PAGES.length-1; // the thank-you page; a blank backs it when the spread needs an even count
+if(PAGES.length%2)PAGES.push({cls:'blank',html:''});
 const dlg=$('#bookDlg'), book=$('#book'), slotL=$('#slotL'), slotR=$('#slotR'), bPrev=$('#bookPrev'), bNext=$('#bookNext'), bCount=$('#bookCount');
 const SPREAD=matchMedia('(min-width: 900px) and (min-height: 560px)');
 let spread=SPREAD.matches, pos=-1, busy=false;
@@ -810,7 +861,7 @@ book.addEventListener('pointercancel',()=>{sx=null});
 SPREAD.addEventListener('change',()=>{spread=SPREAD.matches;$$('.leaf',book).forEach(l=>l.remove());busy=false;pos=pos<0?closedPos():align(pos);if(dlg.open)render()});
 $('#bookBtn').addEventListener('click',()=>openBook(1));
 const chips=$('#chips');
-MENU.forEach((m,k)=>{const c=document.createElement('button');c.type='button';c.className='chip';c.textContent=m[0];c.addEventListener('click',()=>openBook(SEC0+k));chips.appendChild(c)});
+MENU.forEach((m,k)=>{const c=document.createElement('button');c.type='button';c.className='chip';c.textContent=m[0];c.addEventListener('click',()=>openBook(SEC_PAGE[k]));chips.appendChild(c)});
 
 /* ---------- pour your own ---------- */
 const PRICES={'':100,'choc':120,'strong':120,'strong choc':140,'ice':150,'choc ice':170,'strong ice':190,'strong choc ice':210};
