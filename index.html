@@ -100,8 +100,29 @@ h1,h2,h3{font-family:var(--display);font-weight:800;line-height:1.02;letter-spac
 @media (max-height:560px){.cue,.ring{display:none}}
 .static-hero{display:none}
 
-/* the five static-hero gates (must match JS exactly) */
-@media (max-width: 720px), (orientation: portrait) and (max-width: 1024px), (orientation: portrait) and (pointer: coarse), (orientation: landscape) and (pointer: coarse) and (max-height: 560px), (prefers-reduced-motion: reduce){
+/* phones and portrait tablets: portrait video, captions along the bottom (query must match MOBILE_Q in JS) */
+@media (max-width: 720px), (orientation: portrait) and (max-width: 1024px){
+  .hero{height:380vh}
+  .poster,.stage video{object-position:50% 50%;background-position:50% 50%}
+  .scrim{background:linear-gradient(180deg,rgba(8,20,14,.5) 0%,rgba(8,20,14,0) 18%,rgba(8,20,14,0) 42%,rgba(8,20,14,.78) 72%,rgba(8,20,14,.94) 100%)}
+  .band{left:clamp(20px,6vw,56px);right:clamp(20px,6vw,56px);top:auto;bottom:calc(104px + env(safe-area-inset-bottom,0px));transform:none;width:auto}
+  .band::before{inset:-24% -12% -30% -12%}
+  .band h1,.band h2{font-size:clamp(38px,10.5vw,64px)}
+  .band .sub{font-size:17px;margin-top:14px}
+  .band .row{margin-top:20px}
+  .cue{bottom:calc(16px + env(safe-area-inset-bottom,0px))}
+  .ring{right:18px;bottom:calc(18px + env(safe-area-inset-bottom,0px))}
+}
+/* phones held sideways */
+@media (orientation: landscape) and (max-height: 560px){
+  .band{width:min(520px,52vw)}
+  .band h1,.band h2{font-size:clamp(30px,4.8vw,46px)}
+  .band .sub{font-size:15px;margin-top:10px}
+  .band .row{margin-top:14px}
+}
+
+/* static-hero gate: reduced motion only (must match JS exactly) */
+@media (prefers-reduced-motion: reduce){
   .hero{height:auto}
   .stage{position:relative;height:auto;min-height:100svh;display:flex;align-items:flex-end}
   .stage video,.band,.ring,.cue{display:none}
@@ -482,12 +503,17 @@ $$('.band').forEach((band,bi)=>{
 /* ---------- hero scrub ---------- */
 const hero=$('#top'), stage=$('#stage'), video=$('#heroVid'), poster=$('#poster'), ring=$('.ring');
 const bands=$$('.band').map((el,i,arr)=>({el,a:+el.dataset.a,b:+el.dataset.b,ramp:el.dataset.ramp?+el.dataset.ramp:0,first:i===0,last:i===arr.length-1,op:-1,k:-1,live:null}));
-const VIDEO_URL='assets/hero-scrub.mp4', VIDEO_BYTES=3278387;
+const MOBILE_Q='(max-width: 720px), (orientation: portrait) and (max-width: 1024px)';
+const HERO=matchMedia(MOBILE_Q).matches
+  ?{video:'assets/hero-scrub-mobile.mp4',bytes:1930317,poster:'assets/hero-poster-mobile.jpg'}
+  :{video:'assets/hero-scrub.mp4',bytes:4602629,poster:'assets/hero-poster.jpg'};
+const FPS=24;
+let lastSeek=-1;
 let target=0,shown=0,rafId=null,lastTick=0,heroOnScreen=true,scrubOn=false,inited=false,loadK=0,loadStart=0;
 let seekBusy=false,pendingTime=null;
 
 function heroProgress(){const r=hero.getBoundingClientRect();const range=hero.offsetHeight-innerHeight;return range>0?clamp(-r.top/range,0,1):0}
-function requestSeek(t){if(!video.duration||!isFinite(t))return;if(seekBusy){pendingTime=t;return}seekBusy=true;video.currentTime=t}
+function requestSeek(t){if(!video.duration||!isFinite(t))return;t=Math.round(t*FPS)/FPS+0.001;if(t===lastSeek&&!seekBusy)return;if(seekBusy){pendingTime=t;return}seekBusy=true;lastSeek=t;video.currentTime=t}
 video.addEventListener('seeked',()=>{seekBusy=false;if(pendingTime!==null){const t=pendingTime;pendingTime=null;requestSeek(t)}});
 video.addEventListener('error',()=>{seekBusy=false;pendingTime=null;stage.classList.add('video-failed')});
 
@@ -519,24 +545,27 @@ new IntersectionObserver(es=>{heroOnScreen=es[0].isIntersecting;if(heroOnScreen)
 function failVideo(){stage.classList.add('video-failed');ring&&ring.remove()}
 async function loadHeroBlob(){
   const ctrl=new AbortController();let wd=setTimeout(()=>ctrl.abort(),20000);
-  const res=await fetch(VIDEO_URL,{priority:'low',signal:ctrl.signal});
+  const res=await fetch(HERO.video,{priority:'low',signal:ctrl.signal});
   if(!res.ok)throw new Error('video '+res.status);
-  const total=Number(res.headers.get('Content-Length'))||VIDEO_BYTES;
+  const total=Number(res.headers.get('Content-Length'))||HERO.bytes;
   const reader=res.body.getReader();const chunks=[];let got=0,last=0;
   for(;;){const{done,value}=await reader.read();if(done)break;clearTimeout(wd);wd=setTimeout(()=>ctrl.abort(),20000);
     chunks.push(value);got+=value.length;const frac=Math.min(1,got/total);const now=performance.now();
     if(now-last>100||frac===1){last=now;ring.style.setProperty('--ld',Math.round(126*(1-frac)))}}
   clearTimeout(wd);ring.style.setProperty('--ld',0);
   video.src=URL.createObjectURL(new Blob(chunks,{type:'video/mp4'}));video.load();
-  video.addEventListener('canplay',()=>{requestSeek(heroProgress()*(video.duration-0.05));stage.classList.add('video-ready')},{once:true});
+  video.addEventListener('canplay',()=>{
+    // iOS Safari paints nothing on seek until the video has played once
+    const ready=()=>{video.pause();lastSeek=-1;requestSeek(heroProgress()*(video.duration-0.05));stage.classList.add('video-ready')};
+    const p=video.play();if(p&&p.then)p.then(ready,ready);else ready()},{once:true});
 }
 function initHeroOnce(){
   if(inited)return;inited=true;loadStart=performance.now();
-  poster.style.backgroundImage="url('assets/hero-poster.jpg')";
+  poster.style.backgroundImage=`url('${HERO.poster}')`;
   let started=false;const go=()=>{if(started)return;started=true;loadHeroBlob().catch(failVideo)};
-  const im=new Image();im.onload=go;im.onerror=go;im.src='assets/hero-poster.jpg';setTimeout(go,4000);
+  const im=new Image();im.onload=go;im.onerror=go;im.src=HERO.poster;setTimeout(go,4000);
 }
-const GATES=['(max-width: 720px)','(orientation: portrait) and (max-width: 1024px)','(orientation: portrait) and (pointer: coarse)','(orientation: landscape) and (pointer: coarse) and (max-height: 560px)','(prefers-reduced-motion: reduce)'];
+const GATES=['(prefers-reduced-motion: reduce)'];
 function enableScrub(){
   if(scrubOn)return;scrubOn=true;initHeroOnce();
   addEventListener('scroll',onScroll,{passive:true});addEventListener('resize',onScroll,{passive:true});
